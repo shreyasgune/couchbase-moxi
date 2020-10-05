@@ -1,0 +1,62 @@
+file:
+  /opt/moxi:
+    exists: true
+    mode: "0755"
+    owner: moxi
+    group: moxi
+    filetype: directory
+  /opt/moxi/etc/init.sh:
+    exists: true
+    mode: "0755"
+    owner: moxi
+    group: moxi
+    filetype: file
+  /opt/moxi/etc/moxi-cluster.cfg:
+    exists: true
+    mode: "0644"
+    owner: moxi
+    group: moxi
+    filetype: file
+  /opt/moxi/etc/moxi.cfg:
+    exists: true
+    mode: "0644"
+    owner: moxi
+    group: moxi
+    filetype: file
+    contains:
+    - test_moxi
+package:
+  consul:
+    installed: true
+  consul-template:
+    installed: true
+  moxi-server:
+    installed: true
+port:
+  tcp:11211:
+    listening: true
+    ip:
+    - 0.0.0.0
+user:
+  moxi:
+    exists: true
+    groups:
+    - moxi
+    home: /opt/moxi
+    shell: /bin/sh
+command:
+  /opt/moxi/bin/moxi -i | grep moxi:
+    exit-status: 0
+    stdout:
+    - moxi 4.6.0-101
+    stderr: []
+    timeout: 10000
+  echo 'stats proxy' | nc localhost 11211 | grep test_moxi:info:
+    exit-status: 0
+    stdout:
+    - STAT 11211:test_moxi:info:port 11211
+    - STAT 11211:test_moxi:info:name test_moxi
+    - STAT 11211:test_moxi:info:config_ver 1
+    - STAT 11211:test_moxi:info:behaviors_num 1
+    stderr: []
+    timeout: 10000
